@@ -64,13 +64,6 @@ class Selection {
     });
     this.root.addEventListener('compositionend', () => {
       this.composing = false;
-      if (this.cursor.parent) {
-        const range = this.cursor.restore();
-        if (!range) return;
-        setTimeout(() => {
-          this.setNativeRange(range.startNode, range.startOffset, range.endNode, range.endOffset);
-        }, 1);
-      }
     });
   }
 
@@ -266,6 +259,9 @@ class Selection {
   setNativeRange(startNode, startOffset, endNode = startNode, endOffset = startOffset, force = false) {
     debug.info('setNativeRange', startNode, startOffset, endNode, endOffset);
     if (startNode != null && (this.root.parentNode == null || startNode.parentNode == null || endNode.parentNode == null)) {
+      return;
+    }
+    if (startNode.textContent === "\uFEFF" && endNode.textContent === "\uFEFF" && startOffset === 0 && endOffset === 0) {
       return;
     }
     let selection = document.getSelection();
