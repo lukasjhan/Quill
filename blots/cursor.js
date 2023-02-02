@@ -80,7 +80,10 @@ class Cursor extends Parchment.Embed {
         this.domNode.appendChild(this.textNode);
       }
     }
-    this.remove();
+    setTimeout(() => {
+      if (this.selection.composing || this.parent == null || this.textNode.data === Cursor.CONTENTS) return;
+      this.remove();
+    });
     if (start != null) {
       [start, end] = [start, end].map(function(offset) {
         return Math.max(0, Math.min(restoreText.data.length, offset - 1));

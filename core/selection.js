@@ -64,6 +64,11 @@ class Selection {
     });
     this.root.addEventListener('compositionend', () => {
       this.composing = false;
+      if (this.cursor.parent) {
+        const range = this.cursor.restore();
+        if (!range) return;
+        this.setNativeRange(range.startNode, range.startOffset, range.endNode, range.endOffset);
+      }
     });
   }
 
