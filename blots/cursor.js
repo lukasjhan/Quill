@@ -51,6 +51,7 @@ class Cursor extends Parchment.Embed {
   }
 
   remove() {
+    window.console.log('remove');
     super.remove();
     this.parent = null;
   }
@@ -63,6 +64,7 @@ class Cursor extends Parchment.Embed {
     if (range != null && range.start.node === textNode && range.end.node === textNode) {
       [restoreText, start, end] = [textNode, range.start.offset, range.end.offset];
     }
+    window.console.log(restoreText, start, end, range);
     // Link format will insert text outside of anchor tag
     while (this.domNode.lastChild != null && this.domNode.lastChild !== this.textNode) {
       this.domNode.parentNode.insertBefore(this.domNode.lastChild, this.domNode);
@@ -80,7 +82,11 @@ class Cursor extends Parchment.Embed {
         this.domNode.appendChild(this.textNode);
       }
     }
-    this.remove();
+    setTimeout(() => {
+      if (this.selection.composing || this.parent == null || this.textNode.data === Cursor.CONTENTS) return;
+      window.console.log('try remove', this.textNode, this.parent, this.selection.composing);
+      this.remove();
+    });
     if (start != null) {
       [start, end] = [start, end].map(function(offset) {
         return Math.max(0, Math.min(restoreText.data.length, offset - 1));
@@ -99,6 +105,7 @@ class Cursor extends Parchment.Embed {
       return mutation.type === 'characterData' && mutation.target === this.textNode;
     })) {
       let range = this.restore();
+      window.console.log('update', range, mutations, this.selection.composing, context);
       if (range) context.range = range;
     }
   }
